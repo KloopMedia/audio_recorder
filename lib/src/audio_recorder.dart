@@ -94,7 +94,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
     await session.configure(AudioSessionConfiguration(
       avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
       avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.allowBluetooth |
-          AVAudioSessionCategoryOptions.defaultToSpeaker,
+      AVAudioSessionCategoryOptions.defaultToSpeaker,
       avAudioSessionMode: AVAudioSessionMode.spokenAudio,
       avAudioSessionRouteSharingPolicy: AVAudioSessionRouteSharingPolicy.defaultPolicy,
       avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
@@ -408,6 +408,34 @@ class _AudioRecorderState extends State<AudioRecorder> {
     return startStopRecorder;
   }
 
+  void forwardAudio() async {
+    // Forward audio by 10 seconds.
+    final newPosition = sliderCurrentPosition + 10000;
+    if (newPosition < maxDuration) {
+      await seekToPlayer(newPosition.toInt());
+    } else {
+      await seekToPlayer(maxDuration.toInt());
+    }
+  }
+
+  void rewindAudio() async {
+    // Rewind audio by 10 seconds.
+    final newPosition = sliderCurrentPosition - 10000;
+    if (newPosition > 0) {
+      await seekToPlayer(newPosition.toInt());
+    } else {
+      await seekToPlayer(0);
+    }
+  }
+
+  void Function()? onForwardPress() {
+    return playerModule.isPlaying || playerModule.isPaused ? forwardAudio : null;
+  }
+
+  void Function()? onRewindPress() {
+    return playerModule.isPlaying || playerModule.isPaused ? rewindAudio : null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -441,8 +469,28 @@ class _AudioRecorderState extends State<AudioRecorder> {
               height: 50.0,
               child: ClipOval(
                 child: IconButton(
+                  onPressed: onRewindPress(),
+                  icon: const Icon(Icons.replay_10),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 56.0,
+              height: 50.0,
+              child: ClipOval(
+                child: IconButton(
                   onPressed: onStartPausePlayerPressed(),
                   icon: Icon(_isPlaying ? Icons.pause : Icons.play_arrow),
+                ),
+              ),
+            ),
+            SizedBox(
+              width: 56.0,
+              height: 50.0,
+              child: ClipOval(
+                child: IconButton(
+                  onPressed: onForwardPress(),
+                  icon: const Icon(Icons.forward_10),
                 ),
               ),
             ),
