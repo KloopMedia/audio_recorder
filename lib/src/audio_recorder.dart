@@ -5,6 +5,7 @@ import 'dart:typed_data' show Uint8List;
 
 import 'package:audio_session/audio_session.dart';
 import 'package:flutter/material.dart';
+import 'package:logger/logger.dart' show Level;
 import 'package:path_provider/path_provider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:intl/intl.dart' show DateFormat;
@@ -48,8 +49,8 @@ class _AudioRecorderState extends State<AudioRecorder> {
   StreamSubscription? _playerSubscription;
   StreamSubscription? _recordingDataSubscription;
 
-  FlutterSoundPlayer playerModule = FlutterSoundPlayer();
-  FlutterSoundRecorder recorderModule = FlutterSoundRecorder();
+  FlutterSoundPlayer playerModule = FlutterSoundPlayer(logLevel: Level.nothing);
+  FlutterSoundRecorder recorderModule = FlutterSoundRecorder(logLevel: Level.nothing);
 
   String _recorderTxt = '--:--';
   String _playerTxt = '--:--';
