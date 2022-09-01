@@ -32,8 +32,16 @@ typedef OnRecorderStop = void Function(String path);
 class AudioRecorder extends StatefulWidget {
   final String? url;
   final OnRecorderStop onRecorderStop;
+  final bool disabled;
+  final bool isExternal;
 
-  const AudioRecorder({Key? key, this.url, required this.onRecorderStop}) : super(key: key);
+  const AudioRecorder({
+    Key? key,
+    this.url,
+    required this.onRecorderStop,
+    this.disabled = false,
+    this.isExternal = false,
+  }) : super(key: key);
 
   @override
   State<AudioRecorder> createState() => _AudioRecorderState();
@@ -43,7 +51,6 @@ class _AudioRecorderState extends State<AudioRecorder> {
   bool _isRecording = false;
   bool _isPlaying = false;
   String? _path;
-  bool _isExternal = false;
 
   StreamSubscription? _recorderSubscription;
   StreamSubscription? _playerSubscription;
@@ -95,7 +102,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
     await session.configure(AudioSessionConfiguration(
       avAudioSessionCategory: AVAudioSessionCategory.playAndRecord,
       avAudioSessionCategoryOptions: AVAudioSessionCategoryOptions.allowBluetooth |
-      AVAudioSessionCategoryOptions.defaultToSpeaker,
+          AVAudioSessionCategoryOptions.defaultToSpeaker,
       avAudioSessionMode: AVAudioSessionMode.spokenAudio,
       avAudioSessionRouteSharingPolicy: AVAudioSessionRouteSharingPolicy.defaultPolicy,
       avAudioSessionSetActiveOptions: AVAudioSessionSetActiveOptions.none,
@@ -113,7 +120,6 @@ class _AudioRecorderState extends State<AudioRecorder> {
   void initState() {
     if (widget.url != null && widget.url != '') {
       _path = widget.url;
-      _isExternal = true;
     }
     init();
     super.initState();
@@ -444,7 +450,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
         Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: <Widget>[
-            if (!_isExternal)
+            if (!widget.isExternal)
               Row(
                 children: [
                   SizedBox(
@@ -452,7 +458,7 @@ class _AudioRecorderState extends State<AudioRecorder> {
                     height: 50.0,
                     child: ClipOval(
                       child: IconButton(
-                        onPressed: onStartRecorderPressed(),
+                        onPressed: widget.disabled ? null : onStartRecorderPressed(),
                         icon: Icon(_isRecording ? Icons.stop : Icons.mic),
                       ),
                     ),
